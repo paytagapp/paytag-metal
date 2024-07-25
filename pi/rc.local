@@ -1,0 +1,4 @@
+sudo bash /home/paytag/Desktop/paytag/run.sh
+sudo bash /home/paytag/Desktop/kiosk/run.sh
+
+exit 0
