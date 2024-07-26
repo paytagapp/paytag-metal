@@ -8,33 +8,14 @@ from datetime import datetime, timedelta
 from TagData import TagData
 import copy
 import statistics
-# import RPi.GPIO as GPIO
-import platform
-
-if platform.system() == 'Linux' and platform.node().startswith('raspberrypi'):
-    import RPi.GPIO as GPIO
-else:
-    from MockGPIO import GPIO
+import RPi.GPIO as GPIO
 import asyncio
 from PaytagServer import PaytagServer
 from simple_websocket_server import WebSocketServer, WebSocket
 import dataclasses, json
 
 def on_data(raw_data, addr):
-    global hold_in_tub
-    global cart_check_timer
-    if (hold_in_tub == False):
-        print("Hold in tub for 3 seconds...**********")
-        broadcast("HOLD IN TUB") # Ask to hold bag in tub
-        hold_in_tub = True
-        cart_check_timer = time.time() + 3  # Start the timer 
-    
-    # time.sleep(5)
-    # broadcast(json.dumps({
-    #     "unpaidTags": ['5377E249010001', '53FC3255510001']
-    # }))
-    
-    # print(f"Custom handler: Received data from {addr}: {raw_data.decode()}")
+    # print(f"Custom handler: Received data from {addr}: {data.decode()}")
     data = raw_data.decode()
     lines = data.splitlines()
     for line in lines:
@@ -70,7 +51,6 @@ def calculate_delta_dict():
         if key in last_tag_dict:
             last_tag_data = last_tag_dict[key]
             delta_count = tag_data.count - last_tag_data.count
-            # print(f"key: {key}, tag_data.count: {tag_data.count}, last_tag_data.count: {last_tag_data.count}, delta_count: {delta_count}")
             delta_dict[key] = delta_count
         else:
             # If the key is not in last_tag_dict, you may decide to skip it or handle it differently
@@ -121,71 +101,34 @@ def get_stable_items() -> List[str]:
 def turn_on_burners():
     global burners_thread
     global last_server_result
-    global hold_in_tub
     result = PaytagServer.findPaidCartWithItems(get_stable_items())
     last_server_result = result
-    print("******************************")
-    print(result)
-    cart = get_stable_items()
     if result.get("status") == True:
-        # # Set the GPIO mode
-        # GPIO.setmode(GPIO.BCM)
-        # # Set up GPIO 2 as an output
-        # GPIO.setup(2, GPIO.OUT, initial=GPIO.LOW)
-        # GPIO.setup(3, GPIO.OUT, initial=GPIO.LOW)
+        # Set the GPIO mode
+        GPIO.setmode(GPIO.BCM)
+        # Set up GPIO 2 as an output
+        GPIO.setup(2, GPIO.OUT, initial=GPIO.LOW)
+        GPIO.setup(3, GPIO.OUT, initial=GPIO.LOW)
         
         try:
-            # # Turn on GPIO 2
-            # GPIO.output(2, GPIO.HIGH)
-            # GPIO.output(3, GPIO.HIGH)
+            # Turn on GPIO 2
+            GPIO.output(2, GPIO.HIGH)
+            GPIO.output(3, GPIO.HIGH)
             print("GPIO 2 turned on.")
-            # # Wait for 2 seconds
-            # time.sleep(2)
-            # # Turn off GPIO 2
-            # GPIO.output(2, GPIO.LOW)
-            # GPIO.output(3, GPIO.LOW)
-            
-            print("Hold in tub ----------------")
-            print(hold_in_tub)
-            if (hold_in_tub == True):
-                broadcast(json.dumps({
-                    "message": "SUCCESSFULLY NEUTRALIZED",
-                    "paidTags": result.get("tagIdsPaid")
-                }))
+            # Wait for 2 seconds
+            time.sleep(2)
+            # Turn off GPIO 2
+            GPIO.output(2, GPIO.LOW)
+            GPIO.output(3, GPIO.LOW)
             print("GPIO 2 turned off.")
-            print("Successfully Neutralized ")
-            print(result.get("tagIdsPaid"))
         except Exception as e:
             print(f"An error occurred: {e}")
         finally:
-            # # Clean up GPIO settings
-            # GPIO.output(2, GPIO.LOW)
-            # GPIO.output(3, GPIO.LOW)
+            # Clean up GPIO settings
+            GPIO.output(2, GPIO.LOW)
+            GPIO.output(3, GPIO.LOW)
             print("GPIO cleanup done.")
-    elif result.get("tagIdsNotPaid") is not None and len(result.get("tagIdsNotPaid")) > 0:
-        broadcast(json.dumps({
-            "message": "UNPAID TAGS",
-            "unpaidTags": result.get("tagIdsNotPaid")
-        }))
-        # broadcast(json.dumps({
-        #     "message": "UNPAID TAGS",
-        #     "unpaidTags": ['3034DB85C00B79400000002D', '3034DB85C00B794000000031', '3034DB85C00B794000000028', '3034DB85C00B79400000002B', '3034DB85C00B794000000030', 'E2806810000000390D11EC76', '3034DB85C00B79400000002A', '3034DB85C00B79400000002F', '3034DB85C00B794000000029', '53FC3255510001', '5377E249010001', '3034DB85C00B794000000031']
-        # }))
-        print(f"Unpaid tags: {result.get("tagIdsNotPaid")} ")
         
-    elif result.get("tagIdsNotFound") is not None and len(result.get("tagIdsNotFound")) > 0:
-        broadcast(json.dumps({
-            "message": "TAG NOT FOUND",
-            "notFoundTags": result.get("tagIdsNotFound")
-        }))
-        print(f"Not found tags: {result.get("tagIdsNotFound")} ")
-        
-    elif result.get("error"):
-            print(f"Error: {result.get("error")} ")
-        
-    else:
-        print("Unknown result:", result)
-             
     burners_thread = threading.Thread(target=turn_on_burners)
 
 
@@ -218,9 +161,6 @@ def main_loop():
     global delta_dict
     global history_dict
     global avg_dict
-    global cart_check_timer
-    global hold_in_tub
-    global API_initiated
     while True:
         if len(last_tag_dict) == 0:
             last_tag_dict = copy.deepcopy(tag_dict)
@@ -231,18 +171,16 @@ def main_loop():
         update_duration_dict()
         cart = get_stable_items()
         has_cart = len(cart) > 0
-        print(cart)
-        # broadcast(json.dumps({
-        #     "cart": cart,
-        #     "has_cart": has_cart,
-        #     "tag_dict": json.dumps(tag_dict, cls=TagDataEncoder),
-        #     "last_server_result": json.dumps(last_server_result),
-        # }))
+        broadcast(json.dumps({
+            "cart": cart,
+            "has_cart": has_cart,
+            "tag_dict": json.dumps(tag_dict, cls=TagDataEncoder),
+            "last_server_result": json.dumps(last_server_result),
+        }))
 
-        if has_cart and hold_in_tub and not API_initiated and time.time() >= cart_check_timer:
+        if has_cart:
             if (not burners_thread.is_alive()):
                 print('Starting burners.')
-                API_initiated = True
                 burners_thread.start()
             else:
                 print("Burning...")
@@ -259,9 +197,6 @@ history_dict: Dict[str, List[int]] = {}
 avg_dict: Dict[str, int] = {}
 duration_dict: Dict[str, float] = {}
 last_server_result = {}
-hold_in_tub = False
-cart_check_timer = 0
-API_initiated = False
 burners_thread = threading.Thread(target=turn_on_burners)
 
 # Create a thread to run the server
@@ -272,24 +207,12 @@ clients = []
 def broadcast(message):
     for client in clients:
         client.send_message(message)
-class SimpleEcho(WebSocket):   
+class SimpleEcho(WebSocket):
     def handle(self):
-        print(self.data)
-        global hold_in_tub
-        global cart_check_timer
-        global API_initiated
-        # self.send_message(json.dumps({
-        #     "hello": "world"
-        # }))
-        # pass
-        if self.data == "COLLECTED THE BAG":
-            hold_in_tub = False
-            cart_check_timer = 0
-            API_initiated = False
-            
-        # message = self.data.decode('utf-8')  # Decode the message from bytes to string
-        # print(f"Received message from {self.address}: {message}")
-        
+        self.send_message(json.dumps({
+            "hello": "world"
+        }))
+        pass
 
     def connected(self):
         print(self.address, 'connected')
