@@ -15,7 +15,7 @@ class _NewScreenState extends State<NewScreen> with ConnectionStatusHandler<NewS
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('New Screen')),
-      body: Center(child: const Text('Content goes here')),
+      body: const Center(child: Text('Content goes here')),
     );
   }
 }
