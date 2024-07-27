@@ -1,22 +1,149 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pay_tag_tab/screens/product_details/not_paid_products_screen.dart';
+import 'package:pay_tag_tab/screens/product_details/not_paid_and_missing_products_screen.dart';
+import 'package:pay_tag_tab/screens/product_details/product_details_controller.dart';
+import 'package:pay_tag_tab/screens/success_screen.dart';
+import 'package:pay_tag_tab/utils/mixins/connection_status_handler.dart';
 
 class FindCartScreen extends StatefulWidget {
-  const FindCartScreen({super.key});
+  final List<dynamic> inputTagData;
+
+  const FindCartScreen({super.key, required this.inputTagData});
 
   @override
   FindCartScreenState createState() => FindCartScreenState();
 }
 
-class FindCartScreenState extends State<FindCartScreen> {
+class FindCartScreenState extends State<FindCartScreen>
+    with ConnectionStatusHandler<FindCartScreen> {
   final TextEditingController _controller = TextEditingController();
+  final ProductDetailsController _productDetailsController =
+      ProductDetailsController();
+  bool _isLoading = false;
 
-  void _onOkayPressed() {
-    String enteredValue = _controller.text;
-    if (enteredValue.isNotEmpty) {
-      // Process the entered value
-      print('Entered value: $enteredValue');
+  void _onOkayPressed() async {
+    String invoiceNumber = _controller.text;
+    if (invoiceNumber.isNotEmpty) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const LoadingScreen()),
+      );
+
+      await _productDetailsController
+          .findCart(context, invoiceNumber, widget.inputTagData,
+              (Map<String, dynamic>? responseFindCartData) async {
+        if (responseFindCartData != null) {
+          try {
+            final Map<String, dynamic> findCartResult = responseFindCartData;
+            if (!findCartResult['status']) {
+              if (findCartResult.containsKey('tagIdsNotPaid') 
+              // && findCartResult.containsKey('tagIdsMissing')
+              ) {
+                final List<String> tagIdsNotPaid =
+                    findCartResult['tagIdsNotPaid'].cast<String>();
+
+                _productDetailsController
+                    .processMessage(context, {'tag_id': tagIdsNotPaid},
+                        (responseProductDetails) {
+                  if (mounted) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NotPaidAndMissingProductsScreen(
+                            responseProductData: responseProductDetails, 
+                            missingProducts: responseProductDetails
+                        ),
+                      ),
+                    );
+                  }
+                  setState(() {
+                    _isLoading = false;
+                  });
+                });
+              } else if (findCartResult.containsKey('tagIdsNotPaid')) {
+                final List<String> tagIdsNotPaid =
+                    findCartResult['tagIdsNotPaid'].cast<String>();
+
+                _productDetailsController
+                    .processMessage(context, {'tag_id': tagIdsNotPaid},
+                        (responseProductDetails) {
+                  if (mounted) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NotPaidProductsScreen(
+                            responseProductData: responseProductDetails),
+                      ),
+                    );
+                  }
+                  setState(() {
+                    _isLoading = false;
+                  });
+                });
+              } else if (findCartResult.containsKey('tagIdsMissing')) {
+                final List<String> tagIdsMissing =
+                    findCartResult['tagIdsMissing'].cast<String>();
+
+                _productDetailsController
+                    .processMessage(context, {'tag_id': tagIdsMissing},
+                        (responseProductDetails) {
+                  if (mounted) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NotPaidProductsScreen(
+                            responseProductData: responseProductDetails),
+                      ),
+                    );
+                  }
+                  setState(() {
+                    _isLoading = false;
+                  });
+                });
+              } else {
+                Navigator.pop(context); // Remove loading screen
+                setState(() {
+                  _isLoading = false;
+                });
+              }
+            } else if (findCartResult['status']) {
+              final List<String> tagIdsPaid =
+                    findCartResult['tagIdsNotPaid'].cast<String>();
+              Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => SuccessScreen(paidTags: tagIdsPaid)),
+              );
+            } else {
+              // Handle null case
+              Navigator.pop(context); // Remove loading screen
+              setState(() {
+                _isLoading = false;
+              });
+            }
+          } catch (e) {
+            print('Error processing response: $e');
+            Navigator.pop(context); // Remove loading screen
+            setState(() {
+              _isLoading = false;
+            });
+          }
+        } else {
+          // Handle null case
+          Navigator.pop(context); // Remove loading screen
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      });
     }
   }
 
@@ -109,24 +236,23 @@ class FindCartScreenState extends State<FindCartScreen> {
                         controller: _controller,
                         keyboardType: TextInputType.number,
                         style: TextStyle(
-                          fontFamily: GoogleFonts.roboto().fontFamily,
-                          color: Colors.black,
-                          fontSize: screenWidth * 0.0315
-    
-                        ),
+                            fontFamily: GoogleFonts.roboto().fontFamily,
+                            color: Colors.black,
+                            fontSize: screenWidth * 0.0315),
                         decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(screenWidth * 0.005),
-                          borderSide: BorderSide(
-                            color: const Color(0xff1d1b20),
-                            width: screenHeight * 0.9,
+                          border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.circular(screenWidth * 0.005),
+                            borderSide: BorderSide(
+                              color: const Color(0xff1d1b20),
+                              width: screenHeight * 0.9,
+                            ),
                           ),
-                        ),                          
-                        hintText: 'Enter Paytag ID',
-                        filled: true,
-                        fillColor: const Color(0xFFFFFFFF),
-                        contentPadding: const EdgeInsets.all(19.0),
-                        hintStyle: TextStyle(
+                          hintText: 'Enter Paytag ID',
+                          filled: true,
+                          fillColor: const Color(0xFFFFFFFF),
+                          contentPadding: const EdgeInsets.all(19.0),
+                          hintStyle: TextStyle(
                             fontFamily: GoogleFonts.roboto().fontFamily,
                             fontSize: screenWidth * 0.0315,
                             // fontWeight: FontWeight.w500,
@@ -181,11 +307,10 @@ class FindCartScreenState extends State<FindCartScreen> {
                                   child: Text(
                                     (index + 1).toString(),
                                     style: TextStyle(
-                                      fontFamily:
-                                          GoogleFonts.roboto().fontFamily,
-                                      color: Colors.black,
-                                      fontSize: screenWidth * 0.0315
-                                    ),
+                                        fontFamily:
+                                            GoogleFonts.roboto().fontFamily,
+                                        color: Colors.black,
+                                        fontSize: screenWidth * 0.0315),
                                   ),
                                 ),
                               ),
@@ -195,7 +320,7 @@ class FindCartScreenState extends State<FindCartScreen> {
                               padding:
                                   const EdgeInsets.only(top: 16.3, right: 16.3),
                               child: ElevatedButton(
-                                onPressed: () { 
+                                onPressed: () {
                                   if (_controller.text.isNotEmpty) {
                                     _controller.text = _controller.text
                                         .substring(
@@ -234,10 +359,9 @@ class FindCartScreenState extends State<FindCartScreen> {
                               child: Text(
                                 '0',
                                 style: TextStyle(
-                                  fontFamily: GoogleFonts.roboto().fontFamily,
-                                  color: Colors.black,
-                                  fontSize: screenWidth * 0.0315
-                                ),
+                                    fontFamily: GoogleFonts.roboto().fontFamily,
+                                    color: Colors.black,
+                                    fontSize: screenWidth * 0.0315),
                               ),
                             );
                           } else {
@@ -259,11 +383,10 @@ class FindCartScreenState extends State<FindCartScreen> {
                                 child: Text(
                                   'Okay',
                                   style: TextStyle(
-                                    fontFamily:
-                                        GoogleFonts.roboto().fontFamily,
-                                    color: Colors.white,
-                                    fontSize: screenWidth * 0.0288
-                                  ),
+                                      fontFamily:
+                                          GoogleFonts.roboto().fontFamily,
+                                      color: Colors.white,
+                                      fontSize: screenWidth * 0.0288),
                                 ),
                               ),
                             );
@@ -274,9 +397,26 @@ class FindCartScreenState extends State<FindCartScreen> {
                   ],
                 ),
               ),
+              if (_isLoading)
+                const Center(
+                  child: CircularProgressIndicator(),
+                ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class LoadingScreen extends StatelessWidget {
+  const LoadingScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(),
       ),
     );
   }
