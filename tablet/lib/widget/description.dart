@@ -24,32 +24,17 @@ class PaytagDescription extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double descriptionWidth = screenWidth * 0.9; // Adjust percentage as needed
-    if (descriptionWidth > descriptionWidthPixels) {
-      descriptionWidth = descriptionWidthPixels;
-    }
 
     return SizedBox(
-      width: descriptionWidth,
-      height: descriptionHeightPixels,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          // Calculate font size based on available width
-          double fontSize = descriptionFontSize; // Initial font size
-          if (constraints.maxWidth < descriptionWidthPixels) {
-            // Reduce font size proportionally
-            fontSize = descriptionFontSize *
-                (constraints.maxWidth / descriptionWidthPixels);
-          }
-
           return Text(
             descriptionText,
             textAlign: TextAlign.center,
             style: GoogleFonts.openSans(
-              fontSize: fontSize,
+              fontSize: descriptionFontSize,
               fontWeight: descriptionFontWeight,
-              height: descriptionFontLineHeight / fontSize,
+              height: descriptionFontLineHeight / descriptionFontSize,
               letterSpacing: descriptionFontLetter ?? 0 / 100,
             ),
           );

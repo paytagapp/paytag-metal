@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pay_tag_tab/screens/product_details/Item_not_found.dart';
 import 'package:pay_tag_tab/screens/product_details/not_paid_products_screen.dart';
 import 'package:pay_tag_tab/screens/product_details/not_paid_and_missing_products_screen.dart';
 import 'package:pay_tag_tab/screens/product_details/product_details_controller.dart';
@@ -122,8 +123,16 @@ class FindCartScreenState extends State<FindCartScreen>
               MaterialPageRoute(
                   builder: (context) => SuccessScreen(paidTags: tagIdsPaid)),
               );
+            }  else if (findCartResult['tagIdsNotFound']) {
+              final List<String> tagIdsNotFound =
+                    findCartResult['tagIdsNotFound'].cast<String>();
+              Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ItemNotFoundScreen(notFoundTags: tagIdsNotFound)),
+              );
             } else {
-              // Handle null case
+              // Handle null case 
               Navigator.pop(context); // Remove loading screen
               setState(() {
                 _isLoading = false;

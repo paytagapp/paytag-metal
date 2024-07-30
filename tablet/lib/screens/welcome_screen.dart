@@ -65,8 +65,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                PaytagLogo(),
-                SizedBox(height: screenHeight * 0.0),
+                const PaytagLogo(),
+                SizedBox(height: screenHeight * 0.08),
                 PaytagDescription(
                    descriptionText: 'Welcome, please put the bags in the tub to neutralize the stickers',
                     descriptionWidthPixels: screenWidth * 0.58,

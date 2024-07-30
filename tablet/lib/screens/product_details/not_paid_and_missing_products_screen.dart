@@ -38,6 +38,13 @@ class NotPaidAndMissingProductsScreenState
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height; 
+    final safeAreaInsets = mediaQuery.viewInsets;
+    final safeAreaWidth = screenWidth - safeAreaInsets.left - safeAreaInsets.right;
+    final safeAreaHeight = screenHeight - safeAreaInsets.top - safeAreaInsets.bottom;
+
     List<ProductDetails> products = widget.responseProductData;
     List<ProductDetails> missing = widget.missingProducts;
 
@@ -47,10 +54,12 @@ class NotPaidAndMissingProductsScreenState
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const PaytagLogo(),
+            SizedBox(height: screenHeight * 0.0092),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20),
               child: SizedBox(
-                height: 400, // Fixed height for the Row
+                // height: 400, // Fixed height for the Row
+                height: screenHeight * 0.420, // Fixed height for the Row
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -86,7 +95,7 @@ class NotPaidAndMissingProductsScreenState
                               ),
                             ),
                           ),
-                          const SizedBox(height: 20),
+                          SizedBox(height: screenHeight * 0.0620),
                           Expanded(
                             child: ProductSlider(
                               products: missing,
@@ -136,7 +145,7 @@ class NotPaidAndMissingProductsScreenState
                               ),
                             ),
                           ),
-                          const SizedBox(height: 20),
+                          SizedBox(height: screenHeight * 0.0620),
                           Expanded(
                             child: ProductSlider(products: products),
                           ),
@@ -147,6 +156,7 @@ class NotPaidAndMissingProductsScreenState
                 ),
               ),
             ),
+            SizedBox(height: screenHeight * 0.040),
             const PaytagDescription(
               descriptionText:
                   'Please pay for all products using the Paytag App and add missing products before proceeding.',
@@ -157,7 +167,7 @@ class NotPaidAndMissingProductsScreenState
               descriptionFontLineHeight: 61.6,
               descriptionFontLetter: 1,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: screenHeight * 0.040),
             ElevatedButton(
               onPressed: _sendMessage,
               style: ElevatedButton.styleFrom(

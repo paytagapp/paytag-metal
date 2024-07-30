@@ -5,6 +5,7 @@ import 'package:pay_tag_tab/screens/product_details/Item_not_found.dart';
 import 'package:pay_tag_tab/screens/product_details/not_paid_products_screen.dart';
 import 'package:pay_tag_tab/screens/product_details/product_details_controller.dart';
 import 'package:pay_tag_tab/screens/success_screen.dart';
+import 'package:pay_tag_tab/screens/welcome_screen.dart';
 import 'package:pay_tag_tab/services/websocket_service_new.dart';
 import 'package:pay_tag_tab/widget/description.dart';
 import 'package:flutter/services.dart';
@@ -70,6 +71,17 @@ class HoldInTubForThreeSecondsScreenState
                   builder: (context) => ItemNotFoundScreen(
                       notFoundTags: jsonData['tagIdsNotFound'])),
             );
+          } else if (jsonData['message'] != null &&
+              jsonData['message'].contains('NO ITEM IN CART - SCANNING SCREEN')) {
+              final websocketService =
+                Provider.of<WebSocketService>(context, listen: false);
+              websocketService.sendMessage('COLLECTED THE BAG');
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const WelcomeScreen()
+                ),
+              );
           }
         }
       } catch (e) {

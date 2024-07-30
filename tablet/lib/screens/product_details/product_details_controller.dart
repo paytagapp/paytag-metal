@@ -103,7 +103,8 @@ class ProductDetailsController {
       if (decodedData is Map<String, dynamic> &&
           decodedData.containsKey('unpaidTags')) {
         final unpaidTags = decodedData['unpaidTags'] as List<dynamic>;
-        return {'tag_id': unpaidTags};
+        final inputTags = decodedData['inputTags'] as List<dynamic>;
+        return {'tag_id': unpaidTags, 'input_tag_id': inputTags};
       } else {
         print('Error: Invalid JSON format or missing "unpaidTags" key');
         return {}; // Return an empty map
@@ -111,6 +112,47 @@ class ProductDetailsController {
     } catch (e) {
       print('Error decoding message: $e');
       return {}; // Return an empty map
+    }
+  }
+
+  Future<Map<String, dynamic>?> findCart(
+      BuildContext context,
+      String invoiceNumber,
+      List<dynamic> tagIds,
+      Function(Map<String, dynamic>?) onResult) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/find_cart_with_invoice_number_and_tagIds'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'tagIds': tagIds.cast<String>(), // Ensure data is a List<String>
+          'invoiceNumber': invoiceNumber
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        try {
+          final Map<String, dynamic> responseData = jsonDecode(response.body);
+          onResult(responseData);
+          return responseData; // Return for potential further processing
+        } catch (e) {
+          print('Error decoding JSON: $e');
+          onResult(null); // Indicate an error
+          return null;
+        }
+      } else {
+        print('Error response status not 200: ${response.statusCode} ${response.reasonPhrase}');
+        onResult(null);
+        return null;
+      }
+    } on http.ClientException catch (e) {
+      print('HTTP Client Exception: $e');
+      onResult(null);
+      return null;
+    } catch (e) {
+      print('Exception occurred: $e');
+      onResult(null);
+      return null;
     }
   }
 }

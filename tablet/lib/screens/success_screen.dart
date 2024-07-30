@@ -44,7 +44,7 @@ class SuccessScreenState extends State<SuccessScreen>
     super.initState();
     _loadGif(); // Load the GIF when the screen initializes
 
-    Future.delayed(const Duration(seconds: 8), () {
+    Future.delayed(const Duration(seconds: 6), () {
       _sendMessage(); // Send message after 4 seconds
       _redirect();
     });
@@ -98,25 +98,25 @@ class SuccessScreenState extends State<SuccessScreen>
                   ),
                 ),
               const SizedBox(height: 80),
-              ElevatedButton(
-                onPressed: _sendMessage,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromRGBO(22, 72, 121, 1),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(7),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 30,
-                    vertical: 22,
-                  ),
-                  textStyle: const TextStyle(
-                    fontFamily: 'Open Sans',
-                    fontSize: 24,
-                  ),
-                ),
-                child: const Text('OK'),
-              ),
+              // ElevatedButton(
+              //   onPressed: _sendMessage,
+              //   style: ElevatedButton.styleFrom(
+              //     backgroundColor: const Color.fromRGBO(22, 72, 121, 1),
+              //     foregroundColor: Colors.white,
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(7),
+              //     ),
+              //     padding: const EdgeInsets.symmetric(
+              //       horizontal: 30,
+              //       vertical: 22,
+              //     ),
+              //     textStyle: const TextStyle(
+              //       fontFamily: 'Open Sans',
+              //       fontSize: 24,
+              //     ),
+              //   ),
+              //   child: const Text('OK'),
+              // ),
             ],
           ),
         ),

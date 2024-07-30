@@ -7,25 +7,37 @@ class LoadingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    
+    return Scaffold(
       body: Center(
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(screenWidth * 0.046),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              PaytagLogo(),
-              SizedBox(height: 32),
-              CircularProgressIndicator(),
-              SizedBox(height: 32),
-              PaytagDescription(
-                descriptionText: 'Not connected to server, please connect to server!',
-                descriptionWidthPixels: 750,
-                descriptionHeightPixels: 60,
-                descriptionFontWeight: FontWeight.w500,
-                descriptionFontSize: 28,
-                descriptionFontLineHeight: 30,
+              SizedBox(height: screenHeight * 0.0712),
+              SizedBox(
+                width: screenWidth * 0.52,
+                height: screenHeight * 0.082,
+                child: const PaytagLogo()
+              ),
+              SizedBox(height: screenHeight * 0.112),
+              const CircularProgressIndicator(),
+              SizedBox(height: screenHeight * 0.112),
+              SizedBox(
+                width: screenWidth * 1.9,
+                height: screenHeight * 0.09,
+                child: PaytagDescription(
+                  descriptionText: 'Not connected to server, please connect to server!',
+                  descriptionWidthPixels: screenWidth * 0.198,
+                  descriptionHeightPixels: screenHeight * 0.0828,
+                  descriptionFontWeight: FontWeight.w500,
+                  descriptionFontSize: screenWidth * 0.027,
+                  descriptionFontLineHeight: screenWidth * 0.045,
+                ),
               ),
             ],
           ),

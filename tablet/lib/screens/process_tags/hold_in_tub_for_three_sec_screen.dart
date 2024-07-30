@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:pay_tag_tab/screens/Item_not_found.dart';
+import 'package:pay_tag_tab/screens/product_details/Item_not_found.dart';
+import 'package:pay_tag_tab/screens/product_details/find_cart_screen.dart';
 import 'package:pay_tag_tab/screens/product_details/not_paid_products_screen.dart';
 import 'package:pay_tag_tab/screens/product_details/product_details_controller.dart';
 import 'package:pay_tag_tab/screens/success_screen.dart';
+import 'package:pay_tag_tab/screens/welcome_screen.dart';
 import 'package:pay_tag_tab/services/websocket_service_new.dart';
 import 'package:pay_tag_tab/widget/description.dart';
 import 'package:flutter/services.dart';
@@ -42,18 +44,15 @@ class HoldInTubForThreeSecondsScreenState
               jsonData['message'].contains('UNPAID TAGS')) {
             final data =
                 _productDetailsController.extractDataFromMessage(message);
-            _productDetailsController.processMessage(context, data,
-                (responseData) {
-              if (mounted) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => NotPaidProductsScreen(
-                        responseProductData: responseData),
-                  ),
-                );
-              }
-            });
+            if (mounted) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      FindCartScreen(inputTagData: data['input_tag_id']),
+                ),
+              );
+            }
           } else if (jsonData['message'] != null &&
               jsonData['message'].contains('SUCCESSFULLY NEUTRALIZED')) {
             Navigator.pushReplacement(
@@ -70,6 +69,14 @@ class HoldInTubForThreeSecondsScreenState
                   builder: (context) => ItemNotFoundScreen(
                       notFoundTags: jsonData['tagIdsNotFound'])),
             );
+          } else if (jsonData['message'] != null &&
+              jsonData['message'].contains('NO ITEM IN CART - SCANNING SCREEN')) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const WelcomeScreen()
+                ),
+              );
           }
         }
       } catch (e) {
@@ -87,7 +94,8 @@ class HoldInTubForThreeSecondsScreenState
 
   // Load the GIF from assets
   Future<void> _loadGif() async {
-    ByteData data = await rootBundle.load('assets/gif/3_second_wait-Something_went_wrong.gif');
+    ByteData data =
+        await rootBundle.load('assets/gif/three_second_wait-check.gif');
     setState(() {
       _gifData = data;
     });

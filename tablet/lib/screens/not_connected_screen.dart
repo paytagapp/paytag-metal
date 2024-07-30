@@ -14,25 +14,30 @@ class _NotConnectedScreenState extends State<NotConnectedScreen> with Connection
   
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+
+    return Scaffold(
       body: Center(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          padding: EdgeInsets.all(screenWidth * 0.05),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              PaytagLogo(),
-              SizedBox(height: 32),
-              PaytagDescription(
-                descriptionText: 'Server connection lost, please connect to the server!',
-                descriptionWidthPixels: 991,
-                descriptionHeightPixels: 62,
-                descriptionFontWeight: FontWeight.w500,
-                descriptionFontSize: 30 ,
-                descriptionFontLineHeight: 61.6,
+              SizedBox(height: screenHeight * 0.25),
+              const PaytagLogo(),
+              SizedBox(height: screenHeight * 0.085),
+              Expanded(
+                child: PaytagDescription(
+                  descriptionText: 'Server connection lost, please connect to the server!',
+                  descriptionWidthPixels: screenWidth * 0.9,  
+                  descriptionHeightPixels: screenHeight * 0.8,
+                  descriptionFontWeight: FontWeight.w500,
+                  descriptionFontSize: screenWidth * 0.025,
+                  descriptionFontLineHeight: screenWidth * 0.06,
+                ),
               ),
-              SizedBox(height: 128),
             ],
           ),
         ),
