@@ -31,9 +31,46 @@ STABLE_ITEMS_DURATION_THRESHOLD = config.getint('DEFAULT', 'STABLE_ITEMS_DURATIO
 WEB_SOCKET_PORT = config.getint('DEFAULT', 'WEB_SOCKET_PORT')
 SERVER_PORT = config.getint('DEFAULT', 'SERVER_PORT')
 
+last_received_time_in_scanning = time.time()
+last_received_time_in_other = time.time()
+CHECK_INTERVAL = 1
+INACTIVITY_THRESHOLD_FOR_SCANNING_SCREENS = 10 # 10 seconds
+INACTIVITY_THRESHOLD_FOR_OTHER_SCREENS = 600 # 10 minutes 
+
+def check_inactivity():
+    global last_received_time_in_scanning
+    global last_received_time_in_other
+    while True:
+        time.sleep(CHECK_INTERVAL)  # Wait for the check interval
+        current_time = time.time()
+        
+        if current_time - last_received_time_in_scanning > INACTIVITY_THRESHOLD_FOR_SCANNING_SCREENS:
+            print("================================================================")
+            broadcast(json.dumps({
+                "message": "NO ITEM IN CART - SCANNING SCREEN"
+            }))
+            # Reset last_received_time_in_scanning to prevent repeated broadcasting
+            last_received_time_in_scanning = current_time
+            
+        if current_time - last_received_time_in_other > INACTIVITY_THRESHOLD_FOR_OTHER_SCREENS:
+            print("****************************************************************")
+            broadcast(json.dumps({
+                "message": "NO ITEM IN CART - OTHER SCREEN"
+            }))
+            # Reset last_received_time_in_scanning to prevent repeated broadcasting
+            last_received_time_in_other = current_time
+            
 def on_data(raw_data, addr):
     global hold_in_tub
     global cart_check_timer
+    global last_received_time_in_scanning
+    global last_received_time_in_other
+    # Update the last received time
+    last_received_time_in_scanning = time.time()
+    last_received_time_in_other = time.time()
+    
+    print("holding")
+    print(hold_in_tub)
     if (hold_in_tub == False):
         print("Hold in tub for 3 seconds...**********")
         broadcast("HOLD IN TUB") # Ask to hold bag in tub
@@ -84,7 +121,7 @@ def update_history() -> None:
         if key in history_dict:
             history_dict[key].append(value)
             # Keep only the last X items
-            history_dict[key] = history_dict[key][-20:]
+            history_dict[key] = history_dict[key][-HISTORY_LIMIT:]
         else:
             history_dict[key] = [value]
             
@@ -266,6 +303,11 @@ burners_thread = threading.Thread(target=turn_on_burners)
 server_thread = threading.Thread(target=run_server)
 server_thread.start()
 
+# Start the inactivity check in a separate thread
+inactivity_thread = threading.Thread(target=check_inactivity)
+# inactivity_thread.daemon = True
+inactivity_thread.start()
+
 clients = []
 def broadcast(message):
     for client in clients:
@@ -280,6 +322,10 @@ class SimpleEcho(WebSocket):
 
         if self.data == "COLLECTED THE BAG":
             hold_in_tub = False
+            cart_check_timer = 0
+            API_initiated = False
+            
+        if self.data == "RESCAN":
             cart_check_timer = 0
             API_initiated = False
             

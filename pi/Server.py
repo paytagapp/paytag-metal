@@ -21,6 +21,10 @@ class Server(object):
                 self.on_data(data, client_address)
 
     def start_server(self):
+        hostname = socket.gethostname()
+        ip_address = socket.gethostbyname(hostname)
+        print("Server is running on: ")
+        print(ip_address)
         # Bind the socket to the address and port
         self.server_socket.bind((self.server_address, self.server_port))
 
