@@ -16,46 +16,32 @@ class IconAndDescriptionSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-
-    // Container dimensions
-    double containerWidth = screenWidth * 0.8; // Adjust width to be 80% of screen width, or maximum 217.32px
-    // if (containerWidth > 217.32) {
-    //   containerWidth = 217.32;
-    // }
-    double containerHeight = 413; // Fixed height as per the design
-
-    // Text dimensions
-    double textWidth = 411; // Fixed width as per the design
-    double textHeight = 39; // Fixed height as per the design
-
-    // QR Code dimensions
-    double qrCodeSize = 124.32; // Fixed size as per the design
+    double screenHeight = MediaQuery.of(context).size.height;
 
     return SizedBox(
-      width: containerWidth,
-      height: containerHeight,
+      width:  screenWidth * 0.8,
+      height: screenHeight * 0.3,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(
-            width: textWidth,
-            height: textHeight,
+            width: screenWidth * 0.6,
+            height: screenWidth * 0.03,
             child: description != null ? Text(
               description!,
               textAlign: TextAlign.center,
               style: GoogleFonts.openSans(
-                fontSize: 28,
+                fontSize: screenWidth * 0.017,
                 fontWeight: FontWeight.w400,
-                height: 39.2 / 28, // Line height divided by font size
+                height: 1.4,
               ),
             ) : null,
           ),
 
-          const SizedBox(height: 22), // Gap between text and QR code
-          
+          SizedBox(height: screenHeight * 0.02),         
           SizedBox(
-            width: qrCodeSize,
-            height: qrCodeSize,
+            width: screenWidth * 0.075,
+            height: screenWidth * 0.075,
             child: SvgPicture.asset(
               icon,
               fit: BoxFit.contain,

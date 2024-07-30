@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 // import 'package:pay_tag_tab/screens/process_tags/hold_in_tub_for_five_sec_screen.dart';
-import 'package:pay_tag_tab/screens/process_tags/hold_in_tub_for_three_sec_screen.dart';
+import 'package:pay_tag_tab/screens/process_tags/hold_in_tub_for_three_sec_screen_old.dart';
+// import 'package:pay_tag_tab/screens/process_tags/hold_in_tub_for_three_sec_screen.dart';
 import 'package:pay_tag_tab/services/websocket_service_new.dart';
 import 'package:pay_tag_tab/widget/logo_new_blue.dart';
 import 'package:pay_tag_tab/widget/description.dart';
@@ -51,31 +52,32 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       body: SizedBox(
         height: screenHeight,
-        child: const Center(
+        child: Center(
           child: Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(screenWidth * 0.05),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 PaytagLogo(),
-                SizedBox(height: 32),
+                SizedBox(height: screenHeight * 0.0),
                 PaytagDescription(
-                  descriptionText: 'Welcome, please put the bags in the tub to neutralize the stickers',
-                  descriptionWidthPixels: 824,
-                  descriptionHeightPixels: 124,
-                  descriptionFontWeight: FontWeight.w400,
-                  descriptionFontSize: 44,
-                  descriptionFontLineHeight: 61.6,
-                  descriptionFontLetter: 1,
+                   descriptionText: 'Welcome, please put the bags in the tub to neutralize the stickers',
+                    descriptionWidthPixels: screenWidth * 0.58,
+                    descriptionHeightPixels: screenHeight * 0.2,
+                    descriptionFontWeight: FontWeight.w400,
+                    descriptionFontSize: screenWidth * 0.03, 
+                    descriptionFontLineHeight: screenWidth * 0.04,
+                    descriptionFontLetter: 1,
                 ),
-                SizedBox(height: 32),
-                IconAndDescriptionSection(
+                SizedBox(height: screenHeight * 0.03),
+                const IconAndDescriptionSection(
                   icon: 'assets/svg/QR_code.svg',
                   description: 'Download the Paytag App here',
                 ),
