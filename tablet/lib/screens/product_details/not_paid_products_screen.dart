@@ -35,7 +35,6 @@ class NotPaidProductsScreenState extends State<NotPaidProductsScreen>
     try {
       _messageSubscription = websocketService.messageStream.listen((message) {
         final jsonData = jsonDecode(message) as Map<String, dynamic>;
-        print('Received message: $jsonData');  // Debugging log
         if (jsonData['message'] != null &&
             jsonData['message'].contains('NO ITEM IN CART - OTHER SCREEN')) {
           websocketService.sendMessage('COLLECTED THE BAG');

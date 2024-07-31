@@ -71,6 +71,9 @@ class HoldInTubForThreeSecondsScreenState
             );
           } else if (jsonData['message'] != null &&
               jsonData['message'].contains('NO ITEM IN CART - SCANNING SCREEN')) {
+              final websocketService =
+                Provider.of<WebSocketService>(context, listen: false);
+              websocketService.sendMessage('COLLECTED THE BAG');
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
@@ -103,29 +106,31 @@ class HoldInTubForThreeSecondsScreenState
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 32),
-              const PaytagDescription(
+              SizedBox(height: screenHeight * 0.05),
+              PaytagDescription(
                 descriptionText:
                     'Please hold the bag in the tub for 3 seconds...',
-                descriptionWidthPixels: 991,
-                descriptionHeightPixels: 62,
+                descriptionWidthPixels: screenWidth * 0.58,
+                descriptionHeightPixels: screenHeight * 0.2,
                 descriptionFontWeight: FontWeight.w700,
-                descriptionFontSize: 44,
-                descriptionFontLineHeight: 61.6,
+                descriptionFontSize: screenWidth * 0.03, 
+                descriptionFontLineHeight: screenWidth * 0.04,
               ),
-              const SizedBox(height: 128),
+              SizedBox(height: screenHeight * 0.09),
               if (_gifData != null)
                 SizedBox(
-                  width: 250,
-                  height: 250,
+                  width: screenWidth * 0.35,
+                  height: screenHeight * 0.35,
                   child: Image.memory(
                     _gifData!.buffer.asUint8List(),
                     fit: BoxFit.contain,

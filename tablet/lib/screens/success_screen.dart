@@ -68,36 +68,40 @@ class SuccessScreenState extends State<SuccessScreen>
   Widget build(BuildContext context) {
     final paidTags = widget.paidTags;
     final paidTagCount = paidTags.length;
+
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: EdgeInsets.symmetric(vertical : screenWidth * 0.09, horizontal: screenWidth * 0.18),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 25),
+            SizedBox(height: screenHeight * 0.05),
               PaytagDescription(
                 descriptionText:
                     'Successfully neutralized stickers on $paidTagCount products. Please collect all items.',
-                descriptionWidthPixels: 853,
-                descriptionHeightPixels: 124,
+                 descriptionWidthPixels: screenWidth * 0.2,
+                descriptionHeightPixels: screenHeight * 0.04,
                 descriptionFontWeight: FontWeight.w400,
-                descriptionFontSize: 44,
-                descriptionFontLineHeight: 61.6,
+                descriptionFontSize: screenWidth * 0.03,
+                descriptionFontLineHeight: screenWidth * 0.04,
+                descriptionFontLetter: 1,
               ),
-              const SizedBox(height: 90),
+              SizedBox(height: screenHeight * 0.08),
               if (_gifData != null)
                 SizedBox(
-                  width: 200,
-                  height: 200,
+                  width:  screenHeight * 0.2,
+                  height:  screenHeight * 0.2,
                   child: Image.memory(
                     _gifData!.buffer.asUint8List(),
                     fit: BoxFit.contain,
                     gaplessPlayback: true,
                   ),
                 ),
-              const SizedBox(height: 80),
+              // SizedBox(height:  screenHeight * 0.8),
               // ElevatedButton(
               //   onPressed: _sendMessage,
               //   style: ElevatedButton.styleFrom(

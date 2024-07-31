@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -8,7 +9,10 @@ import 'package:pay_tag_tab/screens/product_details/not_paid_products_screen.dar
 import 'package:pay_tag_tab/screens/product_details/not_paid_and_missing_products_screen.dart';
 import 'package:pay_tag_tab/screens/product_details/product_details_controller.dart';
 import 'package:pay_tag_tab/screens/success_screen.dart';
+import 'package:pay_tag_tab/screens/welcome_screen.dart';
+import 'package:pay_tag_tab/services/websocket_service_new.dart';
 import 'package:pay_tag_tab/utils/mixins/connection_status_handler.dart';
+import 'package:provider/provider.dart';
 
 class FindCartScreen extends StatefulWidget {
   final List<dynamic> inputTagData;
@@ -25,6 +29,36 @@ class FindCartScreenState extends State<FindCartScreen>
   final ProductDetailsController _productDetailsController =
       ProductDetailsController();
   bool _isLoading = false;
+  late StreamSubscription<String> _messageSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    final websocketService =
+        Provider.of<WebSocketService>(context, listen: false);
+
+    try {
+      _messageSubscription = websocketService.messageStream.listen((message) {
+        final jsonData = jsonDecode(message) as Map<String, dynamic>;
+        if (jsonData['message'] != null &&
+            jsonData['message'].contains('NO ITEM IN CART - OTHER SCREEN')) {
+          websocketService.sendMessage('COLLECTED THE BAG');
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+          );
+        }
+      });
+    } catch (e) {
+      print('WebSocket connection error: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    _messageSubscription.cancel();
+    super.dispose();
+  }
 
   void _onOkayPressed() async {
     String invoiceNumber = _controller.text;

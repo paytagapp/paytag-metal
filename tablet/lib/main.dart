@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pay_tag_tab/screens/not_connected_screen.dart';
-import 'package:pay_tag_tab/screens/welcome_screen.dart';
+import 'package:pay_tag_tab/screens/splash_screen/splash_screen.dart';
 import 'package:pay_tag_tab/services/websocket_service_new.dart';
-import 'package:pay_tag_tab/utils/mixins/connection_status_handler.dart';
-import 'package:pay_tag_tab/widget/loader.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -36,37 +33,7 @@ class MyApp extends StatelessWidget {
           child: child,
         );
       },
-      home: const WebSocketConnectionChecker(),
-    );
-  }
-}
-
-class WebSocketConnectionChecker extends StatefulWidget {
-  const WebSocketConnectionChecker({super.key});
-
-  @override
-  State<WebSocketConnectionChecker> createState() =>
-      _WebSocketConnectionCheckerState();
-}
-
-class _WebSocketConnectionCheckerState extends State<WebSocketConnectionChecker>
-    with ConnectionStatusHandler<WebSocketConnectionChecker> {
-  @override
-  Widget build(BuildContext context) {
-    final websocketService = Provider.of<WebSocketService>(context);
-
-    return StreamBuilder<bool>(
-      stream: websocketService.connectionStatusStream,
-      initialData: websocketService.isConnected,
-      builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const LoadingScreen();
-        } else if (snapshot.hasData && snapshot.data == true) {
-          return const WelcomeScreen();
-        } else {
-          return const NotConnectedScreen();
-        }
-      },
+      home: const SplashScreen(),
     );
   }
 }

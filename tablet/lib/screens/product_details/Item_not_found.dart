@@ -43,7 +43,7 @@ class _ItemNotFoundScreenState extends State<ItemNotFoundScreen>
   void initState() {
     super.initState();
 
-    Future.delayed(const Duration(seconds: 4), () {
+    Future.delayed(const Duration(seconds: 6), () {
       _sendMessage();
       _redirect();
     });
@@ -57,7 +57,8 @@ class _ItemNotFoundScreenState extends State<ItemNotFoundScreen>
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       body: SizedBox(
@@ -69,16 +70,20 @@ class _ItemNotFoundScreenState extends State<ItemNotFoundScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const PaytagLogo(),
+                SizedBox(
+                  height: screenHeight * 0.14,
+                  width: screenWidth * 0.14,
+                  child: const PaytagLogo()
+                ),
                 const SizedBox(height: 32),
-                const PaytagDescription(
+                PaytagDescription(
                   descriptionText: 'Item not found, please approach a staff',
-                  descriptionWidthPixels: 824,
-                  descriptionHeightPixels: 124,
-                  descriptionFontWeight: FontWeight.w400,
-                  descriptionFontSize: 44,
-                  descriptionFontLineHeight: 61.6,
-                  descriptionFontLetter: 1,
+                  descriptionWidthPixels: screenWidth * 0.58,
+                    descriptionHeightPixels: screenHeight * 0.2,
+                    descriptionFontWeight: FontWeight.w400,
+                    descriptionFontSize: screenWidth * 0.03, 
+                    descriptionFontLineHeight: screenWidth * 0.04,
+                    descriptionFontLetter: 1,
                 ),
                 const SizedBox(height: 80),
                 ElevatedButton(
@@ -89,9 +94,9 @@ class _ItemNotFoundScreenState extends State<ItemNotFoundScreen>
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(7),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 30,
-                      vertical: 22,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.02,
+                      vertical: screenHeight * 0.02,
                     ),
                     textStyle: const TextStyle(
                       fontFamily: 'Open Sans',

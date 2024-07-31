@@ -3,7 +3,10 @@ import 'package:flutter/foundation.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class WebSocketService extends ChangeNotifier {
+  // final String url = "ws://192.168.122.1:8000"; // LAN IP
   final String url = "ws://192.168.1.76:8000"; // LAN IP
+  // final String url = "ws://10.0.0.7:8000"; // LAN IP
+  // final String url = "ws://172.0.0.1:8000"; // LAN IP
   WebSocketChannel? _channel;
 
   final _connectionStatusController = StreamController<bool>.broadcast();
