@@ -69,7 +69,7 @@ class FindCartScreenState extends State<FindCartScreen>
 
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const LoadingScreen()),
+        MaterialPageRoute(builder: (context) => const ProcessingLoader()),
       );
 
       await _productDetailsController
@@ -463,8 +463,8 @@ class FindCartScreenState extends State<FindCartScreen>
   }
 }
 
-class LoadingScreen extends StatelessWidget {
-  const LoadingScreen({super.key});
+class ProcessingLoader extends StatelessWidget {
+  const ProcessingLoader({super.key});
 
   @override
   Widget build(BuildContext context) {

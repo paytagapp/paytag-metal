@@ -36,6 +36,7 @@ dependencies:
   web_socket_channel: ^2.4.0
   parse_server_sdk_flutter: ^8.0.0
   http: ^0.13.3
+  shared_preferences: ^2.3.1
 
 
 

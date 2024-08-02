@@ -1,10 +1,14 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class WebSocketService extends ChangeNotifier {
+  late String url;
+
   // final String url = "ws://192.168.122.1:8000"; // LAN IP
-  final String url = "ws://192.168.1.76:8000"; // LAN IP
+  // final String url = "ws://192.168.179.171:8000"; // LAN IP
+  // final String url = "ws://192.168.1.76:8000"; // LAN IP
   // final String url = "ws://10.0.0.7:8000"; // LAN IP
   // final String url = "ws://172.0.0.1:8000"; // LAN IP
   WebSocketChannel? _channel;
@@ -21,6 +25,13 @@ class WebSocketService extends ChangeNotifier {
   Timer? _reconnectionTimer;
 
   WebSocketService() {
+    _loadIpFromStorage();
+    // _connect();
+  }
+
+  Future<void> _loadIpFromStorage() async {
+    final prefs = await SharedPreferences.getInstance();
+    url = prefs.getString('websocket_ip') ?? "ws://192.168.179.171:8000";
     _connect();
   }
 
@@ -84,5 +95,17 @@ class WebSocketService extends ChangeNotifier {
     _messageController.close();
     _channel?.sink.close();
     super.dispose();
+  }
+
+  Future<void> updateIp(String newIp) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('websocket_ip', newIp);
+    url = newIp;
+    _reconnect();
+  }
+
+  void _reconnect() {
+    _channel?.sink.close();
+    _connect();
   }
 }

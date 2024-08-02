@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pay_tag_tab/helpers/app_colors.dart';
 import 'package:pay_tag_tab/screens/not_connected_screen.dart';
-import 'package:pay_tag_tab/screens/product_details/find_cart_screen.dart';
 import 'package:pay_tag_tab/screens/welcome_screen.dart';
 import 'package:pay_tag_tab/services/websocket_service_new.dart';
 import 'package:pay_tag_tab/utils/mixins/connection_status_handler.dart';
+import 'package:pay_tag_tab/widget/loader.dart';
 import 'package:provider/provider.dart';
 
 class SplashScreen extends StatelessWidget {
