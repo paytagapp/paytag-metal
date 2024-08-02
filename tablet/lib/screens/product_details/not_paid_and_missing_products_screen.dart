@@ -13,13 +13,13 @@ import 'package:pay_tag_tab/widget/logo_new_blue.dart';
 import 'package:provider/provider.dart';
 
 class NotPaidAndMissingProductsScreen extends StatefulWidget {
-  final List<ProductDetails> responseProductData;
+  final List<ProductDetails> unpaidProducts;
   final List<ProductDetails> missingProducts;
   final List<dynamic>? responseInputTagIds;
 
   const NotPaidAndMissingProductsScreen({
     super.key,
-    required this.responseProductData,
+    required this.unpaidProducts,
     required this.missingProducts, 
     this.responseInputTagIds,
   });
@@ -91,7 +91,7 @@ class NotPaidAndMissingProductsScreenState
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height; 
 
-    List<ProductDetails> products = widget.responseProductData;
+    List<ProductDetails> unpaid = widget.unpaidProducts;
     List<ProductDetails> missing = widget.missingProducts;
 
     return Scaffold(
@@ -168,8 +168,8 @@ class NotPaidAndMissingProductsScreenState
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            width: 1097,
-                            height: 62,
+                            width: screenWidth * 0.8,
+                            height: screenWidth * 0.04,
                             alignment: Alignment.center,
                             child: RichText(
                               text: TextSpan(
@@ -184,7 +184,7 @@ class NotPaidAndMissingProductsScreenState
                                 children: [
                                   const TextSpan(text: 'You have '),
                                   TextSpan(
-                                    text: '${products.length} out of ${widget.responseInputTagIds!.length} ',
+                                    text: '${unpaid.length} out of ${widget.responseInputTagIds!.length} ',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w700,
                                     ),
@@ -197,7 +197,7 @@ class NotPaidAndMissingProductsScreenState
                           ),
                           SizedBox(height: screenHeight * 0.0620),
                           Expanded(
-                            child: ProductSlider(products: products),
+                            child: ProductSlider(products: unpaid),
                           ),
                         ],
                       ),

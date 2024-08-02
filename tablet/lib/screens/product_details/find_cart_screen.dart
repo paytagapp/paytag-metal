@@ -79,29 +79,36 @@ class FindCartScreenState extends State<FindCartScreen>
           try {
             final Map<String, dynamic> findCartResult = responseFindCartData;
             if (!findCartResult['status']) {
-              if (findCartResult.containsKey('tagIdsNotPaid') 
-              // && findCartResult.containsKey('tagIdsMissing')
-              ) {
+              if (findCartResult.containsKey('tagIdsNotPaid') &&
+                  findCartResult.containsKey('tagIdsMissing')) {
                 final List<String> tagIdsNotPaid =
                     findCartResult['tagIdsNotPaid'].cast<String>();
-
+                final List<String> tagIdsMisssing =
+                    findCartResult['tagIdsMissing'].cast<String>();
                 _productDetailsController
                     .processMessage(context, {'tag_id': tagIdsNotPaid},
-                        (responseProductDetails) {
-                  if (mounted) {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => NotPaidAndMissingProductsScreen(
-                            responseProductData: responseProductDetails, 
-                            missingProducts: responseProductDetails,
+                        (responseUnpaidProductDetails) {
+                  print(responseUnpaidProductDetails);
+                  _productDetailsController
+                      .processMessage(context, {'tag_id': tagIdsMisssing},
+                          (responseMissingProductDetails) {
+                  print(responseMissingProductDetails);
+
+                    if (mounted) {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NotPaidAndMissingProductsScreen(
+                            unpaidProducts: responseUnpaidProductDetails,
+                            missingProducts: responseMissingProductDetails,
                             responseInputTagIds: findCartResult['tagIdsInput']
+                          ),
                         ),
-                      ),
-                    );
-                  }
-                  setState(() {
-                    _isLoading = false;
+                      );
+                    }
+                    setState(() {
+                      _isLoading = false;
+                    });
                   });
                 });
               } else if (findCartResult.containsKey('tagIdsNotPaid')) {
@@ -117,8 +124,7 @@ class FindCartScreenState extends State<FindCartScreen>
                       MaterialPageRoute(
                         builder: (context) => NotPaidProductsScreen(
                             responseProductData: responseProductDetails,
-                            responseInputTagIds: findCartResult['tagIdsInput']
-                        ),
+                            responseInputTagIds: findCartResult['tagIdsInput']),
                       ),
                     );
                   }
@@ -139,8 +145,7 @@ class FindCartScreenState extends State<FindCartScreen>
                       MaterialPageRoute(
                         builder: (context) => NotPaidProductsScreen(
                             responseProductData: responseProductDetails,
-                            responseInputTagIds: findCartResult['tagIdsInput']
-                        ),
+                            responseInputTagIds: findCartResult['tagIdsInput']),
                       ),
                     );
                   }
@@ -156,22 +161,23 @@ class FindCartScreenState extends State<FindCartScreen>
               }
             } else if (findCartResult['status']) {
               final List<String> tagIdsPaid =
-                    findCartResult['tagIdsNotPaid'].cast<String>();
+                  findCartResult['tagIdsNotPaid'].cast<String>();
               Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => SuccessScreen(paidTags: tagIdsPaid)),
+                context,
+                MaterialPageRoute(
+                    builder: (context) => SuccessScreen(paidTags: tagIdsPaid)),
               );
-            }  else if (findCartResult['tagIdsNotFound']) {
+            } else if (findCartResult['tagIdsNotFound']) {
               final List<String> tagIdsNotFound =
-                    findCartResult['tagIdsNotFound'].cast<String>();
+                  findCartResult['tagIdsNotFound'].cast<String>();
               Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => ItemNotFoundScreen(notFoundTags: tagIdsNotFound)),
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        ItemNotFoundScreen(notFoundTags: tagIdsNotFound)),
               );
             } else {
-              // Handle null case 
+              // Handle null case
               Navigator.pop(context); // Remove loading screen
               setState(() {
                 _isLoading = false;
