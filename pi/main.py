@@ -34,8 +34,10 @@ SERVER_PORT = config.getint('DEFAULT', 'SERVER_PORT')
 last_received_time_in_scanning = time.time()
 last_received_time_in_other = time.time()
 CHECK_INTERVAL = 1
-INACTIVITY_THRESHOLD_FOR_SCANNING_SCREENS = 10 # 10 seconds
-INACTIVITY_THRESHOLD_FOR_OTHER_SCREENS = 600 # 10 minutes 
+INACTIVITY_THRESHOLD_FOR_SCANNING_SCREENS = config.getint('DEFAULT', 'INACTIVITY_THRESHOLD_FOR_SCANNING_SCREENS') # 10 seconds
+INACTIVITY_THRESHOLD_FOR_OTHER_SCREENS = config.getint('DEFAULT', 'INACTIVITY_THRESHOLD_FOR_OTHER_SCREENS') # 10 minutes 
+
+SLEEP_TIME_ON_CANCEL = config.getint('DEFAULT', 'SLEEP_TIME_ON_CANCEL') 
 
 def check_inactivity():
     global last_received_time_in_scanning
@@ -45,7 +47,7 @@ def check_inactivity():
         current_time = time.time()
         
         if current_time - last_received_time_in_scanning > INACTIVITY_THRESHOLD_FOR_SCANNING_SCREENS:
-            print("================================================================")
+            print("--------INACTIVTE FOR PAST 10 SECONDS---------")
             broadcast(json.dumps({
                 "message": "NO ITEM IN CART - SCANNING SCREEN"
             }))
@@ -53,7 +55,7 @@ def check_inactivity():
             last_received_time_in_scanning = current_time
             
         if current_time - last_received_time_in_other > INACTIVITY_THRESHOLD_FOR_OTHER_SCREENS:
-            print("****************************************************************")
+            print("*******************INACTIVTE FOR PAST 10 MINUTES*********************")
             broadcast(json.dumps({
                 "message": "NO ITEM IN CART - OTHER SCREEN"
             }))
@@ -69,8 +71,6 @@ def on_data(raw_data, addr):
     last_received_time_in_scanning = time.time()
     last_received_time_in_other = time.time()
     
-    print("holding")
-    print(hold_in_tub)
     if (hold_in_tub == False):
         print("Hold in tub for 3 seconds...**********")
         broadcast("HOLD IN TUB") # Ask to hold bag in tub
@@ -201,16 +201,18 @@ def turn_on_burners():
         broadcast(json.dumps({
             "message": "UNPAID TAGS",
             "unpaidTags": result.get("tagIdsNotPaid"),
-            "inputTags": result.get("tagIdsInput"),
+            "inputTags": result.get("tagIdsInput"),                    # For Invoice number input screen
         }))
         # broadcast(json.dumps({
         #     "message": "UNPAID TAGS",
         #     # "inputTags": ['3034DB85C00B794000000028', '3034DB85C00B794000000030', '3034DB85C00B794000000028', '3034DB85C00B79400000002B', '3034DB85C00B794000000030', 'E2806810000000390D11EC76', '3034DB85C00B79400000002A', '3034DB85C00B79400000002F', '3034DB85C00B794000000029', '53FC3255510001', '5377E249010001', '3034DB85C00B794000000031'],
-        #     "inputTags": ['3034DB85C00B794000000028', '3034DB85C00B794000000030', '5377E24901000110', '3034DB85C00B794000000028', '3034DB85C00B79400000002B', '3034DB85C00B794000000030', '3034DB85C00B794000000029'],
-        #     "unpaidTags": ['3034DB85C00B794000000028', '3034DB85C00B794000000030' '5377E24901000110']
+        #     "inputTags": ['3034DB85C00B79400000002A', '3034DB85C00B79400000002D', '3034DB85C00B794000000028', '3034DB85C00B794000000028', '3034DB85C00B79400000002B', '3034DB85C00B794000000030', '3034DB85C00B794000000029'],
+        #     "unpaidTags": ['3034DB85C00B79400000002A', '3034DB85C00B79400000002D' '3034DB85C00B794000000028']
         # }))
         print("Unpaid tags:")
         print(result.get("tagIdsNotPaid"))
+        print("Input tags:")
+        print(result.get("tagIdsInput"))
         
     elif result.get("tagIdsNotFound") is not None and len(result.get("tagIdsNotFound")) > 0:
         broadcast(json.dumps({
@@ -282,7 +284,7 @@ def main_loop():
                 burners_thread.start()
             else:
                 print("Burning...Else case...")
-        print_dicts()
+        # print_dicts()
         
         last_tag_dict = copy.deepcopy(tag_dict)
         time.sleep(0.1)
@@ -319,15 +321,50 @@ class SimpleEcho(WebSocket):
         global hold_in_tub
         global cart_check_timer
         global API_initiated
+        
+        global tag_dict
+        global last_tag_dict
+        global delta_dict
+        global history_dict
+        global avg_dict
+        global duration_dict
 
         if self.data == "COLLECTED THE BAG":
             hold_in_tub = False
             cart_check_timer = 0
             API_initiated = False
             
+            tag_dict.clear()
+            last_tag_dict.clear()
+            delta_dict.clear()
+            history_dict.clear()
+            avg_dict.clear()
+            duration_dict.clear()
+            
         if self.data == "RESCAN":
             cart_check_timer = 0
             API_initiated = False
+            
+            tag_dict.clear()
+            last_tag_dict.clear()
+            delta_dict.clear()
+            history_dict.clear()
+            avg_dict.clear()
+            duration_dict.clear()
+            
+        if self.data == "CANCEL":
+            time.sleep(SLEEP_TIME_ON_CANCEL)
+            hold_in_tub = False
+            cart_check_timer = 0
+            API_initiated = False
+            
+            tag_dict.clear()
+            last_tag_dict.clear()
+            delta_dict.clear()
+            history_dict.clear()
+            avg_dict.clear()
+            duration_dict.clear()          
+            
             
     def connected(self):
         print(self.address, 'connected')
