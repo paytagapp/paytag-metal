@@ -15,11 +15,13 @@ import 'package:provider/provider.dart';
 class NotPaidAndMissingProductsScreen extends StatefulWidget {
   final List<ProductDetails> responseProductData;
   final List<ProductDetails> missingProducts;
+  final List<dynamic>? responseInputTagIds;
 
   const NotPaidAndMissingProductsScreen({
     super.key,
     required this.responseProductData,
-    required this.missingProducts,
+    required this.missingProducts, 
+    this.responseInputTagIds,
   });
 
   @override
@@ -65,7 +67,7 @@ class NotPaidAndMissingProductsScreenState
   void _sendCancelMessage() {
     final websocketService =
         Provider.of<WebSocketService>(context, listen: false);
-    websocketService.sendMessage('COLLECTED THE BAG');
+    websocketService.sendMessage('CANCEL');
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const WelcomeScreen()),
@@ -133,7 +135,7 @@ class NotPaidAndMissingProductsScreenState
                                 children: [
                                   const TextSpan(text: 'You have '),
                                   TextSpan(
-                                    text: '${missing.length} ',
+                                    text: '${missing.length} out of ${widget.responseInputTagIds!.length} ',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w700,
                                     ),
@@ -182,7 +184,7 @@ class NotPaidAndMissingProductsScreenState
                                 children: [
                                   const TextSpan(text: 'You have '),
                                   TextSpan(
-                                    text: '${products.length} ',
+                                    text: '${products.length} out of ${widget.responseInputTagIds!.length} ',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w700,
                                     ),

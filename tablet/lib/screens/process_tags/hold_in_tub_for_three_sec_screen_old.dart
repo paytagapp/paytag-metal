@@ -50,7 +50,9 @@ class HoldInTubForThreeSecondsScreenState
                   context,
                   MaterialPageRoute(
                     builder: (context) => NotPaidProductsScreen(
-                        responseProductData: responseData),
+                        responseProductData: responseData,
+                        responseInputTagIds: data['input_tag_id']
+                    ),
                   ),
                 );
               }
@@ -72,16 +74,15 @@ class HoldInTubForThreeSecondsScreenState
                       notFoundTags: jsonData['tagIdsNotFound'])),
             );
           } else if (jsonData['message'] != null &&
-              jsonData['message'].contains('NO ITEM IN CART - SCANNING SCREEN')) {
-              final websocketService =
+              jsonData['message']
+                  .contains('NO ITEM IN CART - SCANNING SCREEN')) {
+            final websocketService =
                 Provider.of<WebSocketService>(context, listen: false);
-              websocketService.sendMessage('COLLECTED THE BAG');
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const WelcomeScreen()
-                ),
-              );
+            websocketService.sendMessage('COLLECTED THE BAG');
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+            );
           }
         }
       } catch (e) {
@@ -99,7 +100,8 @@ class HoldInTubForThreeSecondsScreenState
 
   // Load the GIF from assets
   Future<void> _loadGif() async {
-    ByteData data = await rootBundle.load('assets/gif/three_second_wait-check.gif');
+    ByteData data =
+        await rootBundle.load('assets/gif/three_second_wait-check.gif');
     setState(() {
       _gifData = data;
     });
@@ -124,7 +126,7 @@ class HoldInTubForThreeSecondsScreenState
                 descriptionWidthPixels: screenWidth * 0.58,
                 descriptionHeightPixels: screenHeight * 0.2,
                 descriptionFontWeight: FontWeight.w700,
-                descriptionFontSize: screenWidth * 0.03, 
+                descriptionFontSize: screenWidth * 0.03,
                 descriptionFontLineHeight: screenWidth * 0.04,
               ),
               SizedBox(height: screenHeight * 0.09),

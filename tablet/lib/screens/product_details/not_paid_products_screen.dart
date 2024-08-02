@@ -15,8 +15,9 @@ import 'package:provider/provider.dart';
 
 class NotPaidProductsScreen extends StatefulWidget {
   final List<ProductDetails> responseProductData;
+  final List<dynamic>? responseInputTagIds;
 
-  const NotPaidProductsScreen({super.key, required this.responseProductData});
+  const NotPaidProductsScreen({super.key, required this.responseProductData, this.responseInputTagIds});
 
   @override
   NotPaidProductsScreenState createState() => NotPaidProductsScreenState();
@@ -58,7 +59,7 @@ class NotPaidProductsScreenState extends State<NotPaidProductsScreen>
   void _sendCancelMessage() {
     final websocketService =
         Provider.of<WebSocketService>(context, listen: false);
-    websocketService.sendMessage('COLLECTED THE BAG');
+    websocketService.sendMessage('CANCEL');
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const WelcomeScreen()),
@@ -80,24 +81,20 @@ class NotPaidProductsScreenState extends State<NotPaidProductsScreen>
   Widget build(BuildContext context) {
     List<ProductDetails> products = widget.responseProductData;
 
-
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: Center(
         child: Padding(
           padding: EdgeInsets.all(screenWidth * 0.05),
-
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               SizedBox(
-                height: screenHeight * 0.08,
-                width: screenWidth * 0.08,
-                child: const PaytagLogo()
-              ),
+                  height: screenHeight * 0.08,
+                  width: screenWidth * 0.08,
+                  child: const PaytagLogo()),
               SizedBox(height: screenHeight * 0.03),
-          
               Container(
                 width: screenWidth * 0.8,
                 height: screenWidth * 0.04,
@@ -115,7 +112,7 @@ class NotPaidProductsScreenState extends State<NotPaidProductsScreen>
                     children: [
                       const TextSpan(text: 'You have '),
                       TextSpan(
-                        text: '${products.length} out of ${products.length} ',
+                        text: '${products.length} out of ${widget.responseInputTagIds!.length} ',
                         style: const TextStyle(
                           fontWeight: FontWeight.w700,
                         ),
@@ -177,8 +174,8 @@ class NotPaidProductsScreenState extends State<NotPaidProductsScreen>
                       foregroundColor: const Color.fromRGBO(227, 31, 96, 1),
                       textStyle: TextStyle(
                         fontFamily: 'Open Sans',
-                          fontSize: screenWidth * 0.026,
-                          fontWeight: FontWeight.w500,
+                        fontSize: screenWidth * 0.026,
+                        fontWeight: FontWeight.w500,
                         decoration: TextDecoration.underline,
                       ),
                     ),

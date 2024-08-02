@@ -103,9 +103,10 @@ class ProductDetailsController {
       if (decodedData is Map<String, dynamic> &&
           decodedData.containsKey('unpaidTags')) {
         final unpaidTags = decodedData['unpaidTags'] as List<dynamic>;
-        // final inputTags = decodedData['inputTags'] as List<dynamic>;
-        return {'tag_id': unpaidTags
-        // , 'input_tag_id': inputTags
+        final inputTags = decodedData['inputTags'] as List<dynamic>;
+        return {
+          'tag_id': unpaidTags,
+          'input_tag_id': inputTags
         };
       } else {
         print('Error: Invalid JSON format or missing "unpaidTags" key');

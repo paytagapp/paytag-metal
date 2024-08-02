@@ -94,7 +94,8 @@ class FindCartScreenState extends State<FindCartScreen>
                       MaterialPageRoute(
                         builder: (context) => NotPaidAndMissingProductsScreen(
                             responseProductData: responseProductDetails, 
-                            missingProducts: responseProductDetails
+                            missingProducts: responseProductDetails,
+                            responseInputTagIds: findCartResult['tagIdsInput']
                         ),
                       ),
                     );
@@ -115,7 +116,9 @@ class FindCartScreenState extends State<FindCartScreen>
                       context,
                       MaterialPageRoute(
                         builder: (context) => NotPaidProductsScreen(
-                            responseProductData: responseProductDetails),
+                            responseProductData: responseProductDetails,
+                            responseInputTagIds: findCartResult['tagIdsInput']
+                        ),
                       ),
                     );
                   }
@@ -135,7 +138,9 @@ class FindCartScreenState extends State<FindCartScreen>
                       context,
                       MaterialPageRoute(
                         builder: (context) => NotPaidProductsScreen(
-                            responseProductData: responseProductDetails),
+                            responseProductData: responseProductDetails,
+                            responseInputTagIds: findCartResult['tagIdsInput']
+                        ),
                       ),
                     );
                   }
