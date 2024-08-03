@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:pay_tag_tab/screens/not_connected_screen.dart';
 import 'package:pay_tag_tab/screens/welcome_screen.dart';
 import 'package:pay_tag_tab/services/websocket_service_new.dart';
+import 'package:pay_tag_tab/widget/loader.dart';
 import 'package:provider/provider.dart';
 
 mixin ConnectionStatusHandler<T extends StatefulWidget> on State<T> {
@@ -19,7 +20,7 @@ mixin ConnectionStatusHandler<T extends StatefulWidget> on State<T> {
       if (!isConnected) {
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const NotConnectedScreen()),
+          MaterialPageRoute(builder: (context) => const LoadingScreen()),
           (route) => false,
         );
       } else {

@@ -57,7 +57,7 @@ class _WebSocketConnectionCheckerState extends State<WebSocketConnectionChecker>
         } else if (snapshot.hasData && snapshot.data == true) {
           return const WelcomeScreen();
         } else {
-          return const NotConnectedScreen();
+          return const LoadingScreen();
         }
       },
     );

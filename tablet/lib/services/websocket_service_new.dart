@@ -101,11 +101,5 @@ class WebSocketService extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('websocket_ip', newIp);
     url = newIp;
-    _reconnect();
-  }
-
-  void _reconnect() {
-    _channel?.sink.close();
-    _connect();
   }
 }
