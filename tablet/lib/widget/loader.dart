@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pay_tag_tab/screens/configration/enter_pin_screen.dart';
 import 'package:pay_tag_tab/screens/configration/login_screen.dart';
+import 'package:pay_tag_tab/utils/mixins/connection_status_handler.dart';
 import 'package:pay_tag_tab/widget/logo_new_blue.dart';
 import 'package:pay_tag_tab/widget/description.dart';
 
@@ -12,7 +13,7 @@ class LoadingScreen extends StatefulWidget {
   LoadingScreenState createState() => LoadingScreenState();
 }
 
-class LoadingScreenState extends State<LoadingScreen> with WidgetsBindingObserver {
+class LoadingScreenState extends State<LoadingScreen> with WidgetsBindingObserver, ConnectionStatusHandler {
   int _tapCount = 0;
   Timer? _tapTimer;
   static const int _tapTimeLimit = 10; // Time limit in seconds

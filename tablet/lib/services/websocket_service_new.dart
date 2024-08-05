@@ -102,4 +102,12 @@ class WebSocketService extends ChangeNotifier {
     await prefs.setString('websocket_ip', newIp);
     url = newIp;
   }
+
+  void reconnect() {
+    if (_channel != null) {
+      _channel!.sink.close(); // Close existing connection
+    }
+    _loadIpFromStorage(); // Attempt a new connection
+  }
+
 }

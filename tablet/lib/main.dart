@@ -16,6 +16,28 @@ void main() async {
   );
 }
 
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'Paytag',
+//       theme: ThemeData(
+//         primarySwatch: Colors.blue,
+//         scaffoldBackgroundColor: Colors.white,
+//       ),
+//       builder: (context, child) {
+//         return ChangeNotifierProvider(
+//           create: (context) => WebSocketService(),
+//           child: child,
+//         );
+//       },
+//       home: const SplashScreen(),
+//     );
+//   }
+// }
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -27,12 +49,6 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: Colors.white,
       ),
-      builder: (context, child) {
-        return ChangeNotifierProvider(
-          create: (context) => WebSocketService(),
-          child: child,
-        );
-      },
       home: const SplashScreen(),
     );
   }
