@@ -67,11 +67,12 @@ def on_data(raw_data, addr):
     global cart_check_timer
     global last_received_time_in_scanning
     global last_received_time_in_other
+    global clients
     # Update the last received time
     last_received_time_in_scanning = time.time()
     last_received_time_in_other = time.time()
     
-    if (hold_in_tub == False):
+    if (hold_in_tub == False and len(clients) > 0):
         print("Hold in tub for 3 seconds...**********")
         broadcast("HOLD IN TUB") # Ask to hold bag in tub
         hold_in_tub = True
@@ -264,6 +265,7 @@ def main_loop():
     global cart_check_timer
     global hold_in_tub
     global API_initiated
+    global clients
     while True:
         if len(last_tag_dict) == 0:
             last_tag_dict = copy.deepcopy(tag_dict)
@@ -276,7 +278,7 @@ def main_loop():
         has_cart = len(cart) > 0
         print(cart)                    # PRINT FOR TESTING
 
-        if has_cart and hold_in_tub and not API_initiated and time.time() >= cart_check_timer:
+        if has_cart and hold_in_tub and not API_initiated and time.time() >= cart_check_timer and len(clients) > 0:
         # if has_cart and time.time() >= cart_check_timer:
         # if has_cart and not API_initiated:
             if not burners_thread.is_alive():
@@ -328,6 +330,7 @@ class SimpleEcho(WebSocket):
         global history_dict
         global avg_dict
         global duration_dict
+        global last_server_result
 
         if self.data == "COLLECTED THE BAG":
             hold_in_tub = False
@@ -340,6 +343,7 @@ class SimpleEcho(WebSocket):
             history_dict.clear()
             avg_dict.clear()
             duration_dict.clear()
+            last_server_result.clear()
             
         if self.data == "RESCAN":
             cart_check_timer = 0
@@ -351,6 +355,7 @@ class SimpleEcho(WebSocket):
             history_dict.clear()
             avg_dict.clear()
             duration_dict.clear()
+            last_server_result.clear()
             
         if self.data == "CANCEL":
             time.sleep(SLEEP_TIME_ON_CANCEL)
@@ -363,7 +368,8 @@ class SimpleEcho(WebSocket):
             delta_dict.clear()
             history_dict.clear()
             avg_dict.clear()
-            duration_dict.clear()          
+            duration_dict.clear()
+            last_server_result.clear()      
             
             
     def connected(self):
@@ -373,10 +379,34 @@ class SimpleEcho(WebSocket):
         clients.append(self)
 
     def handle_close(self):
+        global hold_in_tub
+        global cart_check_timer
+        global API_initiated
+        
+        global tag_dict
+        global last_tag_dict
+        global delta_dict
+        global history_dict
+        global avg_dict
+        global duration_dict
+        global last_server_result
+        
         clients.remove(self)
         print(self.address, 'closed')
         for client in clients:
             client.send_message(self.address[0] + u' - disconnected')
+        if (len(clients) == 0):
+            hold_in_tub = False
+            cart_check_timer = 0
+            API_initiated = False
+            
+            tag_dict.clear()
+            last_tag_dict.clear()
+            delta_dict.clear()
+            history_dict.clear()
+            avg_dict.clear()
+            duration_dict.clear()
+            last_server_result.clear()
 
 def run_websocket():
     server = WebSocketServer('0.0.0.0', WEB_SOCKET_PORT, SimpleEcho)
